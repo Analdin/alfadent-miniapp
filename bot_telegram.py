@@ -33,11 +33,11 @@ from telegram.ext import (
 
 # ---------------- CONFIGURATION ----------------
 load_dotenv()
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "").strip()
-BITRIX24_WEBHOOK_RAW = os.getenv("BITRIX24_WEBHOOK", "").strip().rstrip("/")
-WEBAPP_URL = os.getenv("WEBAPP_URL", "").strip().rstrip("/")
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "8467382002:AAH11wp1u1jLzBGUbErcjJXGzC-TomNtkc4").strip()
+BITRIX24_WEBHOOK_RAW = os.getenv("BITRIX24_WEBHOOK", "https://alfadent23.bitrix24.ru/rest/11599/tleyme67jjk7x2gf/").strip().rstrip("/")
+WEBAPP_URL = "https://alfadent-miniapp.onrender.com/miniapp.html"
 BITRIX24_WEBHOOK = BITRIX24_WEBHOOK_RAW + "/" if BITRIX24_WEBHOOK_RAW else ""
-ADMIN_IDS = [int(x.strip()) for x in os.getenv("ADMIN_IDS", "").split(",") if x.strip().isdigit()]
+ADMIN_IDS = [int(x.strip()) for x in os.getenv("ADMIN_IDS", "14000457").split(",") if x.strip().isdigit()]
 AUTH_MODE = os.getenv("AUTH_MODE", "sms_not_configured").strip().lower()  # demo | sms_not_configured
 DEMO_OTP_CODE = os.getenv("DEMO_OTP_CODE", "1234").strip()
 CLINIC_PHONE = "+7 (988) 233-77-25"
