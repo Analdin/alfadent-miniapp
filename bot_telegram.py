@@ -35,7 +35,11 @@ from telegram.ext import (
 load_dotenv()
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "8467382002:AAH11wp1u1jLzBGUbErcjJXGzC-TomNtkc4").strip()
 BITRIX24_WEBHOOK_RAW = os.getenv("BITRIX24_WEBHOOK", "https://alfadent23.bitrix24.ru/rest/11599/tleyme67jjk7x2gf/").strip().rstrip("/")
-WEBAPP_URL = "https://alfadent-miniapp.onrender.com/miniapp.html"
+WEBAPP_URL = os.getenv("WEBAPP_URL", "https://alfadent-miniapp.onrender.com/miniapp.html").strip().rstrip("/")
+# SOCKS5-прокси используется только для запросов Telegram Bot API и getUpdates.
+# Замените placeholders своими НОВЫМИ учётными данными прокси; ранее показанные в чате
+# логин/пароль использовать не следует. Спецсимволы в логине/пароле URL-кодируйте.
+TELEGRAM_PROXY = "socks5://WPQT0J2C:WJXIKKC2@130.180.226.183:59637"
 BITRIX24_WEBHOOK = BITRIX24_WEBHOOK_RAW + "/" if BITRIX24_WEBHOOK_RAW else ""
 ADMIN_IDS = [int(x.strip()) for x in os.getenv("ADMIN_IDS", "14000457").split(",") if x.strip().isdigit()]
 AUTH_MODE = os.getenv("AUTH_MODE", "sms_not_configured").strip().lower()  # demo | sms_not_configured
@@ -759,7 +763,15 @@ def main():
         logger.warning("WEBAPP_URL не задан или не HTTPS: кнопка Mini App останется информационной.")
     if AUTH_MODE == "demo":
         logger.warning("ВНИМАНИЕ: включён DEMO-режим авторизации. Не использовать для реальных пациентов.")
-    app = Application.builder().token(TELEGRAM_TOKEN).build()
+    if "LOGIN:PASSWORD@IP:PORT" in TELEGRAM_PROXY or "@IP:PORT" in TELEGRAM_PROXY:
+        raise RuntimeError("Укажите действующий SOCKS5-прокси в переменной TELEGRAM_PROXY перед запуском.")
+    app = (
+        Application.builder()
+        .token(TELEGRAM_TOKEN)
+        .proxy(TELEGRAM_PROXY)
+        .get_updates_proxy(TELEGRAM_PROXY)
+        .build()
+    )
     app.add_handler(CommandHandler("start", start_command))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     app.add_handler(CallbackQueryHandler(callback_query_handler))
