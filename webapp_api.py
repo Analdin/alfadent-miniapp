@@ -14,6 +14,7 @@ import logging
 import os
 import re
 import time
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qsl
@@ -148,14 +149,16 @@ def create_support(body: RequestBody):
     name = clean(p.get("name"), 100) or clean(tg_user.get("first_name"), 100) or "Пациент"
     phone = normalize_payload_phone(clean(p.get("phone"), 40)) if clean(p.get("phone"), 40) else ""
     message = clean(p.get("message"), 2000)
+    urgent = message.lower().startswith("срочное обращение") or "экстренно" in message.lower()
     if len(message) < 3:
         raise HTTPException(status_code=422, detail="Напишите вопрос администратору.")
+    if urgent and not phone:
+        raise HTTPException(status_code=422, detail="Для экстренного обращения укажите телефон для связи.")
     session = bot.session_for(user_id, name)
     session["name"] = name
     session["phone"] = phone
-    urgent = message.lower().startswith("срочное обращение") or "экстренно" in message.lower()
     title = ("[MINI APP] ЭКСТРЕННОЕ обращение" if urgent else "[MINI APP] Вопрос пациента")
-    comments = f"Пациент: {name}\nТелефон: {phone or 'не указан'}\nTelegram ID: {user_id}\nКанал: Telegram Mini App\n\n{message}"
+    comments = f"Пациент: {name}\nТелефон: {phone or 'не указан'}\nTelegram ID: {user_id}\nКанал: Telegram Mini App\nВремя обращения: {datetime.now().astimezone().isoformat(timespec='seconds')}\n\n{message}"
     result = write_general_lead(user_id, name, phone, title, comments)
     return {"ok": True, "lead_id": result["lead_id"], "message": "Экстренное обращение передано в CRM." if urgent else "Обращение передано в CRM. Администратор свяжется с вами."}
 
