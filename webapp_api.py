@@ -31,7 +31,7 @@ import bot_telegram as bot
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO").upper())
 log = logging.getLogger("alfadent_webapp_api")
 WEB_DIR = Path(__file__).resolve().parent / "web"
-BOT_TOKEN = os.getenv("TELEGRAM_TOKEN", "").strip()
+BOT_TOKEN = os.getenv("TELEGRAM_TOKEN", getattr(bot, "TELEGRAM_TOKEN", "")).strip()
 INITDATA_MAX_AGE_SECONDS = int(os.getenv("INITDATA_MAX_AGE_SECONDS", "86400"))
 
 app = FastAPI(title="АльфаДент Mini App API", docs_url=None, redoc_url=None)
@@ -43,8 +43,8 @@ class RequestBody(BaseModel):
 
 
 def validated_telegram_user(init_data: str) -> dict[str, Any]:
-    if not BOT_TOKEN:
-        raise HTTPException(status_code=503, detail="API не настроен: отсутствует TELEGRAM_TOKEN.")
+    if not BOT_TOKEN or BOT_TOKEN.startswith("PASTE_NEW_"):
+        raise HTTPException(status_code=503, detail="API не настроен: укажите новый TELEGRAM_TOKEN в конфигурации бота.")
     if not init_data:
         raise HTTPException(status_code=401, detail="Откройте Mini App из Telegram, чтобы отправить запрос.")
     try:
@@ -128,6 +128,7 @@ def create_appointment(body: RequestBody):
         "doctor": clean(p.get("doctor"), 200),
         "date": clean(p.get("date"), 40),
         "time": clean(p.get("time"), 40),
+        "promotion": clean(p.get("promotion"), 250),
         "mode": "Mini App",
     }
     if not any(appointment.get(k) for k in ("problem", "service", "doctor")):
