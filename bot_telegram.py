@@ -36,7 +36,7 @@ BITRIX24_WEBHOOK_RAW = 'https://alfadent23.bitrix24.ru/rest/11599/tleyme67jjk7x2
 # Render / route serves web/miniapp.html; override via WEBAPP_URL in .env if needed.
 WEBAPP_URL = "https://alfadent-miniapp.onrender.com/miniapp.html"
 # SOCKS5 proxy for Telegram Bot API and getUpdates (python-telegram-bot 22.x).
-TELEGRAM_PROXY = "socks5://us-maryland-baltimore-as701-PI5Zn:uJPavsOLGwM8@isp.shifter.io:443"
+TELEGRAM_PROXY = "socks5://WPQT0J2C:WJXIKKC2@130.180.226.183:59637"
 BITRIX24_WEBHOOK = BITRIX24_WEBHOOK_RAW + "/" if BITRIX24_WEBHOOK_RAW else ""
 ADMIN_IDS = [int(x.strip()) for x in '14000457'.split(",") if x.strip().isdigit()]
 AUTH_MODE = "sms_not_configured"
