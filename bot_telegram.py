@@ -35,6 +35,8 @@ TELEGRAM_TOKEN = '8467382002:AAH11wp1u1jLzBGUbErcjJXGzC-TomNtkc4'
 BITRIX24_WEBHOOK_RAW = 'https://alfadent23.bitrix24.ru/rest/11599/tleyme67jjk7x2gf/'.strip().rstrip("/")
 # Render / route serves web/miniapp.html; override via WEBAPP_URL in .env if needed.
 WEBAPP_URL = "https://alfadent-miniapp.onrender.com/miniapp.html"
+# SOCKS5 proxy for Telegram Bot API and getUpdates (python-telegram-bot 22.x).
+TELEGRAM_PROXY = "socks5://us-california-los_angeles-as20001-6h1kz:uJPavsOLGwM8@isp.shifter.io:443"
 BITRIX24_WEBHOOK = BITRIX24_WEBHOOK_RAW + "/" if BITRIX24_WEBHOOK_RAW else ""
 ADMIN_IDS = [int(x.strip()) for x in '14000457'.split(",") if x.strip().isdigit()]
 AUTH_MODE = "sms_not_configured"
@@ -761,7 +763,13 @@ def main():
         logger.warning("WEBAPP_URL не задан или не HTTPS: кнопка Mini App останется информационной.")
     if AUTH_MODE == "demo":
         logger.warning("ВНИМАНИЕ: включён DEMO-режим авторизации. Не использовать для реальных пациентов.")
-    app = Application.builder().token(TELEGRAM_TOKEN).build()
+    app = (
+        Application.builder()
+        .token(TELEGRAM_TOKEN)
+        .proxy(TELEGRAM_PROXY)
+        .get_updates_proxy(TELEGRAM_PROXY)
+        .build()
+    )
     app.add_handler(CommandHandler("start", start_command))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     app.add_handler(CallbackQueryHandler(callback_query_handler))
